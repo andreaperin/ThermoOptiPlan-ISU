@@ -141,12 +141,15 @@ final_T_model = Model(df -> final_temperature.(df.extraction_temperatures, df.fl
 # End of the simulation (t_end in the .prj) in years
 const t_end_years = 2365200000 / 365 / 24 / 60 / 60
 
+# true if the OGS run reached t_end (works on extraction_temperatures and final_T, time is last)
+is_complete(temperature_data::Vector{Vector{Float64}}) = last(temperature_data[end]) >= t_end_years - 1e-6
+
 function crossing_year(final_temperature_data::Vector{Vector{Float64}})
     T = first.(final_temperature_data)
     t = last.(final_temperature_data)
 
     # incomplete (crashed) OGS run
-    if t[end] < t_end_years - 1e-6
+    if !is_complete(final_temperature_data)
         return NaN
     end
 

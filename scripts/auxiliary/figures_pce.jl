@@ -1,5 +1,5 @@
-include(joinpath(@__DIR__, "..", "src", "paths.jl"))
-include(joinpath(@__DIR__, "..", "src", "plotting.jl"))
+include(joinpath(@__DIR__, "..", "..", "src", "paths.jl"))
+include(joinpath(@__DIR__, "plot_sobols.jl"))
 
 # Sobols
 
