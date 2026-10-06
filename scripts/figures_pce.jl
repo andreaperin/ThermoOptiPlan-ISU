@@ -1,9 +1,9 @@
-include("plot_sobols.jl")
+include(joinpath(@__DIR__, "..", "src", "paths.jl"))
+include(joinpath(@__DIR__, "..", "src", "plotting.jl"))
 
 # Sobols
 
-@load "results/pce/2026_05_01_04_09_3layers_sobolsampling_128_deg_4.jld2"
-pce128 = res[1]
+pce128 = load(joinpath(SURROGATES_DIR, "2026_05_01_04_09_3layers_sobolsampling_128_deg_4.jld2"), "res")[1]
 
 title = L"Sobol's Indices - Crossing Year - 128 samples - deg 4"
 plot_sobol = plot_sobols(
@@ -16,8 +16,7 @@ plot_sobol = plot_sobols(
 path2save = "/home/perin/Documents/academic/slides/ThermoOptiPlan/5_presentation_INTERNAL/imgs"
 PGFPlotsX.save(joinpath(path2save, "Sobols128.pdf"), plot_sobol)
 
-@load "results/pce/2026_05_17_13_15_3layers_sobolsampling_256_deg_4.jld2"
-pce256 = res[1]
+pce256 = load(joinpath(SURROGATES_DIR, "2026_05_17_13_15_3layers_sobolsampling_256_deg_4.jld2"), "res")[1]
 
 title = L"Sobol's Indices - Crossing Year - 256 samples - deg 4"
 plot_sobol = plot_sobols(
@@ -30,8 +29,7 @@ plot_sobol = plot_sobols(
 path2save = "/home/perin/Documents/academic/slides/ThermoOptiPlan/5_presentation_INTERNAL/imgs"
 PGFPlotsX.save(joinpath(path2save, "Sobols256.pdf"), plot_sobol)
 
-@load "results/pce/2026_05_29_21_00_3layers_sobolsampling_512_deg_4.jld2"
-pce512 = res[1]
+pce512 = load(joinpath(SURROGATES_DIR, "2026_05_29_21_00_3layers_sobolsampling_512_deg_4.jld2"), "res")[1]
 
 title = L"Sobol's Indices - Crossing Year - 512 samples - deg 4"
 plot_sobol = plot_sobols(

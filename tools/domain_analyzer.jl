@@ -1,15 +1,15 @@
 using Pkg
 
-domain_vtu_file = "model_inputs/Model_ML_IRZ/Multi_BW_line_IRZ_domain_ini.vtu"
-pump2_vtu_file = "model_inputs/Model_ML_IRZ/Multi_BW_line_IRZ_physical_group_Pump_line_2.vtu"
-pump3_vtu_file = "model_inputs/Model_ML_IRZ/Multi_BW_line_IRZ_physical_group_Pump_line_3.vtu"
-pump4_vtu_file = "model_inputs/Model_ML_IRZ/Multi_BW_line_IRZ_physical_group_Pump_line_4.vtu"
+domain_vtu_file = "models/multilayer_irz/Multi_BW_line_IRZ_domain_ini.vtu"
+pump2_vtu_file = "models/multilayer_irz/Multi_BW_line_IRZ_physical_group_Pump_line_2.vtu"
+pump3_vtu_file = "models/multilayer_irz/Multi_BW_line_IRZ_physical_group_Pump_line_3.vtu"
+pump4_vtu_file = "models/multilayer_irz/Multi_BW_line_IRZ_physical_group_Pump_line_4.vtu"
 
 if Sys.islinux()
     osrelease = "/etc/os-release"
     data = read(osrelease, String)
     if occursin("Solus", data)
-        ENV["PYTHON"] = "/home/perin/Documents/projects/work/code/thermoptiplan_new/.venv/bin/python"
+        ENV["PYTHON"] = normpath(joinpath(@__DIR__, "..", ".venv", "bin", "python"))
     elseif occursin("NixOS", data)
         ENV["PYTHON"] = "/home/lau/python_venv/bin/python"
     end

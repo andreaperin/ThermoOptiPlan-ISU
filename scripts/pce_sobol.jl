@@ -2,18 +2,18 @@ using Dates
 using UncertaintyQuantification
 using JLD2
 
-include("src/model_3layers.jl")
+include(joinpath(@__DIR__, "..", "src", "model_3layers.jl"))
 
 const TRAIN_SAMPLES = 1024
 const PCE_DEGREE = 4
 
-const WORK_DIR = "/work/andrea.perin/ThermoOptiPlan/output/Model_ML_IRZ_3layers"
+const WORK_DIR = joinpath(RUNS_DIR, "multilayer_irz")
 const cleanup = true
 
-const path_to_pce = joinpath("/work/andrea.perin/ThermoOptiPlan/results/pce")
+const path_to_pce = SURROGATES_DIR
 
 options = Dict(
-               "job-name" => "pce_internal_scheduler",
+               "job-name" => "pce_sobol",
                "account" => "andrea.perin",
                "ntasks" => "1",
                "cpus-per-task" => "1",

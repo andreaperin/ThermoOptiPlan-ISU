@@ -3,12 +3,10 @@ using Pkg
 if Sys.islinux()
     osrelease = "/etc/os-release"
     data = read(osrelease, String)
-    if occursin("Solus", data)
-        ENV["PYTHON"] = "/home/perin/Projects/ThermoOptiPlan/.venv/bin/python"
+    if occursin("Solus", data) || occursin("Ubuntu", data)
+        ENV["PYTHON"] = normpath(joinpath(@__DIR__, "..", ".venv", "bin", "python"))
     elseif occursin("NixOS", data)
         ENV["PYTHON"] = "/home/lau/python_venv/bin/python"
-    elseif occursin("Ubuntu", data)
-        ENV["PYTHON"] = "/home/andrea.perin/ThermoOptiPlan/.venv/bin/python"
     end
 end
 

@@ -7,4 +7,7 @@
 #SBATCH --mail-user=andrea.perin@irz.uni-hannover.de
 #SBATCH --mail-type=ALL
 
-julia --project -e 'using Pkg; Pkg.instantiate(); include("./pce_internal_scheduler.jl")'
+# Submit from the repository root: sbatch scripts/pce_sobol.sh
+export THERMOOPTIPLAN_DATA=/work/andrea.perin/ThermoOptiPlan/data
+
+julia --project=. -e 'using Pkg; Pkg.instantiate(); include("scripts/pce_sobol.jl")'

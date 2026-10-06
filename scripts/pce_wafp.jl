@@ -1,12 +1,12 @@
 using UncertaintyQuantification
 using JLD2
 
-include("src/model_3layers.jl")
+include(joinpath(@__DIR__, "..", "src", "model_3layers.jl"))
 
 const TRAIN_SAMPLES = 128
 const PCE_DEGREE = 4
 
-const WORK_DIR = "/work/andrea.perin/ThermoOptiPlan/output/Model_ML_IRZ_3layers"
+const WORK_DIR = joinpath(RUNS_DIR, "multilayer_irz")
 const cleanup = false
 
 wafp_inputs = [kappa_sandstone2, kappa_sandstone3]
@@ -66,7 +66,7 @@ w = w[pout]
 # println("Running polynomial chaos construction (this may run external model per sample)...")
 
 
-# path_to_pce = joinpath("/work/andrea.perin/ThermoOptiPlan/results/pce")
+# path_to_pce = SURROGATES_DIR
 # mkpath(path_to_pce)
 
 # @show("start pce analysis with simulation: $(est)")

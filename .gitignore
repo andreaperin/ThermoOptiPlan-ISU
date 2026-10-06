@@ -2,17 +2,11 @@
 .venv
 .python-version
 
-model/ogs
-model/ogs/*
+# generated data (raw OGS runs, surrogates, datasets)
+data/
 
-output/*
-results/*
-
-imgs/*
-Tests
-model_inputs/MultiLayerModel
-model_inputs/OneLayer_Coarse
-model_inputs/OneLayer_Fine
+# unpacked original models
+archive/original_models/*/
 
 *.out
 

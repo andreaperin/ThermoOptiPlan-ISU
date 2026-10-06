@@ -1,6 +1,7 @@
 using UncertaintyQuantification
 
-include(joinpath(@__DIR__, "..", "extractor.jl"))
+include(joinpath(@__DIR__, "paths.jl"))
+include(joinpath(@__DIR__, "extractor.jl"))
 
 # Layer naming: the solid-property RVs are numbered 1/2/3, the OGS parameters 2/3/4.
 #   sandstone1 / Sandstone_2 -> top    (Sand_2, medium 1)
@@ -8,7 +9,7 @@ include(joinpath(@__DIR__, "..", "extractor.jl"))
 #   sandstone3 / Sandstone_4 -> bottom (Sand_4, medium 3)
 
 const OGS_CMD = "ogs"
-const SOURCE_DIR = joinpath(@__DIR__, "..", "model_inputs", "Model_ML_IRZ")
+const SOURCE_DIR = joinpath(MODELS_DIR, "multilayer_irz")
 
 const x_extractor = 2_250.0
 const y_extractor = 0.0
