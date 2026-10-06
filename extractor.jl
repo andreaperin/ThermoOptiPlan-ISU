@@ -12,7 +12,20 @@ if Sys.islinux()
     end
 end
 
-Pkg.build("PyCall")
+# Rebuild PyCall only if it was built for another python or its libpython is gone
+function pycall_needs_build(python::String)
+    depfile = joinpath(dirname(Base.find_package("PyCall")), "..", "deps", "deps.jl")
+    isfile(depfile) || return true
+    deps = read(depfile, String)
+    built_python = match(r"const python = \"(.*)\"", deps)
+    libpython = match(r"const libpython = \"(.*)\"", deps)
+    (built_python === nothing || libpython === nothing) && return true
+    return built_python.captures[1] != python || !isfile(libpython.captures[1])
+end
+
+if haskey(ENV, "PYTHON") && pycall_needs_build(ENV["PYTHON"])
+    Pkg.build("PyCall")
+end
 
 using PyCall
 using Statistics
