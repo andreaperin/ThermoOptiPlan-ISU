@@ -4,7 +4,7 @@ using JLD2
 
 include("extractor.jl")
 
-const TRAIN_SAMPLES = 32
+const TRAIN_SAMPLES = 1024
 const PCE_DEGREE = 4
 
 const OGS_CMD = "ogs"

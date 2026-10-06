@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH --account=andrea.perin
+#SBATCH --job-name=1024_cleanup
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
