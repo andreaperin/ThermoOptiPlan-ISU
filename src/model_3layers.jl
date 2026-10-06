@@ -47,17 +47,20 @@ const extrafiles = [
 
 # Random variables
 
-dist_thermal_conductivity_sandstone = Truncated(Normal(2.38, 0.25), 1.5675, 2.6125) # Approx 25% uncertainty window tapered towards the limits
+# Normal with σ = 10% of the nominal value, truncated at ±20% around it
+layer_distribution(nominal::Real) = Truncated(Normal(nominal, 0.1 * nominal), 0.8 * nominal, 1.2 * nominal)
+
+dist_thermal_conductivity_sandstone = Truncated(Normal(2.38, 0.25), 0.75 * 2.38, 1.25 * 2.38) # Approx 25% uncertainty window tapered towards the limits
 dist_specific_heat_capacity_sandstone = Truncated(Normal(820, 80), 615, 1025) # Approx 25% uncertainty window tapered towards the limits
 dist_density_sandstone = Truncated(Normal(2690, 100), 2400, 2800) # Approx 10% uncertainty window tapered towards the limits
 
-dist_porosity_parameter_sandstone1 = Truncated(Normal(0.19, 0.05), 0.18, 0.23)
-dist_porosity_parameter_sandstone2 = Truncated(Normal(0.20, 0.05), 0.18, 0.23)
-dist_porosity_parameter_sandstone3 = Truncated(Normal(0.22, 0.05), 0.18, 0.23)
+dist_porosity_parameter_sandstone1 = layer_distribution(0.19)
+dist_porosity_parameter_sandstone2 = layer_distribution(0.20)
+dist_porosity_parameter_sandstone3 = layer_distribution(0.22)
 
-dist_kappa_sandstone1 = Truncated(Normal(1.56e-13, 2.868e-13), 1.912e-13, 2.868e-13)
-dist_kappa_sandstone2 = Truncated(Normal(2.39e-13, 2.868e-13), 1.912e-13, 2.868e-13)
-dist_kappa_sandstone3 = Truncated(Normal(4.97e-13, 2.868e-13), 1.912e-13, 2.868e-13)
+dist_kappa_sandstone1 = layer_distribution(1.56e-13)
+dist_kappa_sandstone2 = layer_distribution(2.39e-13)
+dist_kappa_sandstone3 = layer_distribution(4.97e-13)
 
 thermal_conductivity_sandstone1 = RandomVariable(dist_thermal_conductivity_sandstone, :thermal_conductivity_sandstone1)
 thermal_conductivity_sandstone2 = RandomVariable(dist_thermal_conductivity_sandstone, :thermal_conductivity_sandstone2)
@@ -111,14 +114,22 @@ end
 
 # Post-processing models
 
-function flow_percentage(kappa_bottom::Real, kappa_middle::Real, kappa_top::Real, Δz_bottom::Tuple, Δz_middle::Tuple, Δz_top::Tuple)
-    kappas = [kappa_bottom, kappa_middle, kappa_top]
+# Pumping rates per metre of well line, as in the .prj (Pump_4, Pump_3, Pump_2).
+# The pump lines span exactly the Δz intervals, so the flow of each layer is rate * thickness.
+const pump_rates = [7.966e-4, 3.72e-4, 2.43e-4] # bottom, middle, top
+
+function flow_percentage(rates::Vector{<:Real}, Δz_bottom::Tuple, Δz_middle::Tuple, Δz_top::Tuple)
     thicknesses = [abs(a - b) for (a, b) in [Δz_bottom, Δz_middle, Δz_top]]
-    flows = kappas .* thicknesses
+    flows = rates .* thicknesses
     return flows ./ sum(flows)
 end
 
-flow_model = Model(df -> flow_percentage.(df.kappa_Sandstone_4, df.kappa_Sandstone_3, df.kappa_Sandstone_2, Ref(Δz_bottom), Ref(Δz_middle), Ref(Δz_top)), :flows)
+# Fixed shares (≈ 0.325, 0.430, 0.245), consistent with the rates OGS simulates.
+# Future work: make the pumping rates κ-dependent in the .prj (fixed total, split by κ·h)
+# and compute these shares from the sampled permeabilities instead.
+const flow_shares = flow_percentage(pump_rates, Δz_bottom, Δz_middle, Δz_top)
+
+flow_model = Model(df -> fill(flow_shares, size(df, 1)), :flows)
 
 function final_temperature(extraction_temperatures::Vector{Vector{Float64}}, flows::Vector{Float64})
     return [[sum(v[1:3] .* flows), v[4]] for v in extraction_temperatures]
@@ -126,9 +137,17 @@ end
 
 final_T_model = Model(df -> final_temperature.(df.extraction_temperatures, df.flows), :final_T)
 
+# End of the simulation (t_end in the .prj) in years
+const t_end_years = 2365200000 / 365 / 24 / 60 / 60
+
 function crossing_year(final_temperature_data::Vector{Vector{Float64}})
     T = first.(final_temperature_data)
     t = last.(final_temperature_data)
+
+    # incomplete (crashed) OGS run
+    if t[end] < t_end_years - 1e-6
+        return NaN
+    end
 
     T0 = T[1]
     target = T0 - 1
