@@ -1,5 +1,5 @@
 using JLD2
-using UncertaintyQuantification.DataFrames
+using DataFrames
 
 include(joinpath(@__DIR__, "..", "src", "model_3layers.jl"))
 

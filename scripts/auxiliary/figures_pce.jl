@@ -1,6 +1,8 @@
 include(joinpath(@__DIR__, "..", "..", "src", "paths.jl"))
 include(joinpath(@__DIR__, "plot_sobols.jl"))
 
+const path2save = "/home/perin/Documents/academic/slides/ThermoOptiPlan/5_presentation_INTERNAL/imgs"
+
 # Sobols
 
 pce128 = load(joinpath(SURROGATES_DIR, "2026_05_01_04_09_3layers_sobolsampling_128_deg_4.jld2"), "res")[1]
@@ -13,7 +15,6 @@ plot_sobol = plot_sobols(
     ymin=0.0,
     ymax=0.4
 )
-path2save = "/home/perin/Documents/academic/slides/ThermoOptiPlan/5_presentation_INTERNAL/imgs"
 PGFPlotsX.save(joinpath(path2save, "Sobols128.pdf"), plot_sobol)
 
 pce256 = load(joinpath(SURROGATES_DIR, "2026_05_17_13_15_3layers_sobolsampling_256_deg_4.jld2"), "res")[1]
@@ -26,7 +27,6 @@ plot_sobol = plot_sobols(
     ymin=0.0,
     ymax=0.4
 )
-path2save = "/home/perin/Documents/academic/slides/ThermoOptiPlan/5_presentation_INTERNAL/imgs"
 PGFPlotsX.save(joinpath(path2save, "Sobols256.pdf"), plot_sobol)
 
 pce512 = load(joinpath(SURROGATES_DIR, "2026_05_29_21_00_3layers_sobolsampling_512_deg_4.jld2"), "res")[1]
@@ -39,12 +39,12 @@ plot_sobol = plot_sobols(
     ymin=0.0,
     ymax=0.4
 )
-path2save = "/home/perin/Documents/academic/slides/ThermoOptiPlan/5_presentation_INTERNAL/imgs"
 PGFPlotsX.save(joinpath(path2save, "Sobols512.pdf"), plot_sobol)
 
 # Tests
 
-@load "/home/perin/Projects/ThermoOptiPlan/Tests/test_12.jld2"
+# the old test set: the first 12 runs of the 512 run
+df = load(joinpath(SURROGATES_DIR, "2026_05_29_21_00_3layers_sobolsampling_512_deg_4.jld2"), "res")[2][1:12, :]
 true_values = df.crossing_year
 
 df_test128 = df[:, 1:15]
@@ -79,7 +79,6 @@ p128 = @pgf Axis(
         Coordinates([(minv128, minv128), (maxv128, maxv128)])
     )
 )
-path2save = "/home/perin/Documents/academic/slides/ThermoOptiPlan/5_presentation_INTERNAL/imgs"
 PGFPlotsX.save(joinpath(path2save, "test_performance128.pdf"), p128)
 
 
@@ -114,7 +113,6 @@ p256 = @pgf Axis(
         Coordinates([(minv256, minv256), (maxv256, maxv256)])
     )
 )
-path2save = "/home/perin/Documents/academic/slides/ThermoOptiPlan/5_presentation_INTERNAL/imgs"
 PGFPlotsX.save(joinpath(path2save, "test_performance256.pdf"), p256)
 
 df_test512 = df[:, 1:15]
@@ -149,5 +147,4 @@ p512 = @pgf Axis(
         Coordinates([(minv512, minv512), (maxv512, maxv512)])
     )
 )
-path2save = "/home/perin/Documents/academic/slides/ThermoOptiPlan/5_presentation_INTERNAL/imgs"
 PGFPlotsX.save(joinpath(path2save, "test_performance512.pdf"), p512)
