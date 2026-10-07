@@ -27,6 +27,8 @@ end
 
 using PyCall
 using Statistics
+using Base64
+using CodecZlib
 pv = pyimport("pyvista")
 
 function _average_extraction_temperature(outputfile::String, mask)
@@ -72,6 +74,73 @@ function extraction_temperatures_over_time(output_path::String, x::Float64, y::F
 
             return vcat(T_means, Δyear)
         end, vtu_files)
+
+    return sort(results, by=x -> x[end])
+end
+
+# Fast variant: reads only the arrays it needs ("Points" once, "T" per time step) straight from
+# the OGS .vtu files (appended, base64, zlib), about 1/15 of each file. Same result as above.
+
+# Read one data array of a .vtu file without reading the rest of the file
+function read_vtu_array(file::String, name::String)
+    open(file) do io
+        header = String(read(io, 16_384))
+        appended = findfirst("<AppendedData", header)
+        appended === nothing && error("$file: no <AppendedData> in the first 16 kB")
+        data_start = findnext('_', header, last(appended)) # data begins right after '_'
+
+        offsets = [parse(Int, m.captures[1]) for m in eachmatch(r"<DataArray[^>]*offset=\"\s*(\d+)", header)]
+        m = match(Regex("<DataArray[^>]*Name=\"$name\"[^>]*offset=\"\\s*(\\d+)"), header)
+        m === nothing && error("$file: no array $name")
+        offset = parse(Int, m.captures[1])
+        next_offset = minimum(o for o in offsets if o > offset)
+
+        seek(io, data_start + offset)
+        text = String(read(io, next_offset - offset))
+
+        # header: [number of blocks, block size, last block size, compressed size of each block] as UInt64
+        nblocks = Int(reinterpret(UInt64, base64decode(text[1:32]))[1])
+        header_length = 4 * cld(8 * (3 + nblocks), 3)
+        compressed_sizes = Int.(reinterpret(UInt64, base64decode(text[1:header_length]))[4:end])
+        compressed = base64decode(rstrip(text[header_length+1:end]))
+        length(compressed) == sum(compressed_sizes) || error("$file: $name is truncated")
+
+        bounds = cumsum([0; compressed_sizes])
+        bytes = reduce(vcat, [transcode(ZlibDecompressor, compressed[bounds[i]+1:bounds[i+1]]) for i in 1:nblocks])
+        return reinterpret(Float64, bytes)
+    end
+end
+
+# Retry reads, for flaky network drives
+function read_vtu_array(file::String, name::String, attempts::Int)
+    for attempt in 1:attempts
+        try
+            return read_vtu_array(file, name)
+        catch err
+            attempt == attempts && rethrow()
+            sleep(2)
+        end
+    end
+end
+
+function extraction_temperatures_over_time_fast(output_path::String, x::Float64, y::Float64, Δz::Vector{Tuple{Float64,Float64}}; tol_xy::Real=0.5, attempts::Int=3)
+    vtu_files = filter(f -> endswith(f, "000.vtu"), readdir(output_path))
+
+    points = reshape(read_vtu_array(joinpath(output_path, vtu_files[1]), "Points", attempts), 3, :)
+    masks = [
+        [abs(p[1] - x) < tol_xy && abs(p[2] - y) < tol_xy && zmin ≤ p[3] ≤ zmax for p in eachcol(points)]
+        for (zmin, zmax) in Δz
+    ]
+
+    results = map(vtu_files) do vtu_file
+        T_data = read_vtu_array(joinpath(output_path, vtu_file), "T", attempts)
+        length(T_data) == size(points, 2) || error("$vtu_file: T has $(length(T_data)) values, mesh has $(size(points, 2)) points")
+        T_means = [mean(T_data[mask]) for mask in masks]
+
+        m = match(r"t_(\d+(?:\.\d+)?)\.vtu", vtu_file)
+        Δyear = parse(Float64, m.captures[1]) / 365 / 24 / 60 / 60
+        return vcat(T_means, Δyear)
+    end
 
     return sort(results, by=x -> x[end])
 end

@@ -30,8 +30,9 @@ end
     dataframe_from_ogs(run_dir)
 
 Same as `dataframe_from_pce`, but read directly from the OGS output folders
-`run_dir/sample-*`: inputs from the rendered .prj, temperatures from the .vtu files.
-Samples without results are skipped.
+`run_dir/sample-*`: inputs from the rendered .prj, temperatures from the .vtu files
+(only the T array is read, so it is fast also on network drives).
+Samples without results or with unreadable .vtu files are skipped.
 """
 function dataframe_from_ogs(run_dir::String)
     rows = []
@@ -49,7 +50,12 @@ function dataframe_from_ogs(run_dir::String)
             values[Symbol(m.captures[1])] = parse(Float64, match(r"<values?>\s*([^<\s]+)\s*</values?>", r).captures[1])
         end
 
-        temperatures = extraction_temperatures_over_time(path, x_extractor, y_extractor, Δz_extractor)
+        temperatures = try
+            extraction_temperatures_over_time_fast(path, x_extractor, y_extractor, Δz_extractor)
+        catch
+            @warn "Skipping $sample: a .vtu file could not be read, even after 3 attempts"
+            continue
+        end
         push!(rows, (; values..., extraction_temperatures=temperatures))
     end
     return inputs_and_output(DataFrame(rows))
