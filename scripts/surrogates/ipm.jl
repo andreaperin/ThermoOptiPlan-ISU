@@ -1,21 +1,11 @@
 using UncertaintyQuantification
-using JLD2, DataFrames, Random
 
-include(joinpath(@__DIR__, "..", "src", "paths.jl"))
+include(joinpath(@__DIR__, "settings.jl")) # DATASET, TEST_PERCENT, TAG, train_test_split
 
-df = load(joinpath(DATASETS_DIR, "dataset_3layers_v1_969.jld2"), "df")
+train, test = train_test_split()
 
 output = :crossing_year
-inputs = Symbol.(names(df, Not(output)))
-
-# train/test split: TEST_PERCENT of the runs are used for testing (e.g. 20 or 90)
-TEST_PERCENT = 20
-suffix = "v1_969_test$(TEST_PERCENT)" # file names: ipm_<scaled|not_scaled>_<suffix>.jld2
-
-Random.seed!(1)
-idx = shuffle(1:size(df, 1))
-ntest = round(Int, TEST_PERCENT / 100 * size(df, 1))
-test, train = df[idx[1:ntest], :], df[idx[(ntest + 1):end], :]
+inputs = Symbol.(names(train, Not(output)))
 
 # IPM not SCALED
 
@@ -31,7 +21,7 @@ println("mean width:    ", mean(ub .- lb), " years")
 println("β for ≥90% coverage: ", reliability(ipm_not_scaled, 0.1))
 
 mkpath(SURROGATES_DIR)
-jldsave(joinpath(SURROGATES_DIR, "ipm_not_scaled_$(suffix).jld2"); ipm_not_scaled, test, lb, ub)
+jldsave(joinpath(SURROGATES_DIR, "ipm_not_scaled_$(TAG).jld2"); ipm_not_scaled, test, lb, ub)
 
 # IPM scaled
 
@@ -59,4 +49,4 @@ println("mean width:    ", mean(ub .- lb), " years")
 println("β for ≥90% coverage: ", reliability(ipm_scaled, 0.1))
 
 mkpath(SURROGATES_DIR)
-jldsave(joinpath(SURROGATES_DIR, "ipm_scaled_$(suffix).jld2"); ipm_scaled, lo, hi, test, lb, ub)
+jldsave(joinpath(SURROGATES_DIR, "ipm_scaled_$(TAG).jld2"); ipm_scaled, lo, hi, test, lb, ub)

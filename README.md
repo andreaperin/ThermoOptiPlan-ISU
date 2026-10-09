@@ -8,7 +8,7 @@ Output: `crossing_year`, the year the mixed production temperature drops 1 K bel
 | Folder | Content |
 |---|---|
 | `src/` | model definition: random inputs, OGS model, post-processing, paths |
-| `scripts/` | analyses to run (`pce_sobol`, `pce_wafp`, `run_nominal`); `auxiliary/` for dataset and figures |
+| `scripts/` | OGS runs (`run_samples`, `run_nominal`); `surrogates/` fits (`pce`, `pce_wafp`, `ipm`, `lbfm`, shared `settings.jl`); `auxiliary/` dataset and figures |
 | `tools/` | `dataset.jl` (inputs + output DataFrame for GP training), `domain_analyzer.jl` |
 | `models/` | OGS inputs: `multilayer_irz` (template), `multilayer_irz_nominal` |
 | `data/` | generated, not in git: `runs/`, `surrogates/`, `datasets/` |
@@ -23,7 +23,7 @@ python3 -m venv .venv && .venv/bin/pip install -r py_requirements.txt
 
 ## Run
 
-From the repository root. On the cluster: `sbatch scripts/pce_sobol.sh` (data goes to `$THERMOOPTIPLAN_DATA`, set in the `.sh`).
+From the repository root. On the cluster: `sbatch scripts/surrogates/pce.sh` (data goes to `$THERMOOPTIPLAN_DATA`, set in the `.sh`).
 
 ## Notes
 

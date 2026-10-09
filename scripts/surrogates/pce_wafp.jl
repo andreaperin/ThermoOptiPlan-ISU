@@ -1,7 +1,7 @@
 using UncertaintyQuantification
 using JLD2
 
-include(joinpath(@__DIR__, "..", "src", "model_3layers.jl"))
+include(joinpath(@__DIR__, "..", "..", "src", "model_3layers.jl"))
 
 const TRAIN_SAMPLES = 128
 const PCE_DEGREE = 4
