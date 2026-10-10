@@ -1,6 +1,6 @@
 using UncertaintyQuantification
 
-include(joinpath(@__DIR__, "settings.jl")) # DATASET, TEST_PERCENT, TAG, train_test_split
+include(joinpath(@__DIR__, "settings.jl")) # DATASET, TEST_PERCENT, TAG, train_test_split, scaler
 
 train, test = train_test_split()
 
@@ -25,16 +25,8 @@ jldsave(joinpath(SURROGATES_DIR, "ipm_not_scaled_$(TAG).jld2"); ipm_not_scaled, 
 
 # IPM scaled
 
-# scale into [-1,1] all the inputs
-lo = Dict(c => minimum(train[!, c]) for c in inputs)
-hi = Dict(c => maximum(train[!, c]) for c in inputs)
-function scale(d)
-    s = copy(d)
-    for c in inputs
-        s[!, c] = 2 .* (d[!, c] .- lo[c]) ./ (hi[c] .- lo[c]) .- 1
-    end
-    return s
-end
+# scale into [-1,1] all the inputs (min/max of the training set)
+scale, lo, hi = scaler(train, inputs)
 
 @time ipm_scaled = IntervalPredictorModel(scale(train), output, MonomialBasis(length(inputs), 1), inputs)
 

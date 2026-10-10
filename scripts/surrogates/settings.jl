@@ -5,7 +5,7 @@ using JLD2, DataFrames, Random
 
 include(joinpath(@__DIR__, "..", "..", "src", "paths.jl"))
 
-DATASET = "v2_123" # uses data/datasets/dataset_3layers_<DATASET>.jld2
+DATASET = "v1_123" # uses data/datasets/dataset_3layers_<DATASET>.jld2
 TEST_PERCENT = 20  # % of the runs kept for testing (e.g. 20 or 90)
 SEED = 1           # same seed -> same train/test split for every surrogate
 
@@ -22,4 +22,17 @@ function train_test_split()
     idx = shuffle(1:size(df, 1))
     ntest = round(Int, TEST_PERCENT / 100 * size(df, 1))
     return df[idx[(ntest + 1):end], :], df[idx[1:ntest], :]
+end
+
+function scaler(train, inputs)
+    lo = Dict(c => minimum(train[!, c]) for c in inputs)
+    hi = Dict(c => maximum(train[!, c]) for c in inputs)
+    function scale(d)
+        s = copy(d)
+        for c in inputs
+            s[!, c] = 2 .* (d[!, c] .- lo[c]) ./ (hi[c] .- lo[c]) .- 1
+        end
+        return s
+    end
+    return scale, lo, hi
 end
