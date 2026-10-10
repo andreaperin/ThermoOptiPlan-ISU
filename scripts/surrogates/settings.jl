@@ -5,7 +5,7 @@ using JLD2, DataFrames, Random
 
 include(joinpath(@__DIR__, "..", "..", "src", "paths.jl"))
 
-DATASET = "v1_123" # uses data/datasets/dataset_3layers_<DATASET>.jld2
+DATASET = "v2_123" # uses data/datasets/dataset_3layers_<DATASET>.jld2
 TEST_PERCENT = 20  # % of the runs kept for testing (e.g. 20 or 90)
 SEED = 1           # same seed -> same train/test split for every surrogate
 
