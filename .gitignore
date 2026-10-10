@@ -2,8 +2,9 @@
 .venv
 .python-version
 
-# generated data (raw OGS runs, surrogates, datasets)
-data/
+# generated data (raw OGS runs, surrogates, figures); clean datasets are tracked
+data/*
+!data/datasets/
 
 # unpacked original models
 archive/original_models/*/
