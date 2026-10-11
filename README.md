@@ -8,11 +8,12 @@ Output: `crossing_year`, the year the mixed production temperature drops 1 K bel
 | Folder | Content |
 |---|---|
 | `src/` | model definition: random inputs, OGS model, post-processing, paths |
-| `scripts/` | OGS runs (`run_samples`, `run_nominal`); `surrogates/` fits (`pce`, `pce_wafp`, `ipm`, `lbfm`, shared `settings.jl`); `auxiliary/` dataset and figures |
+| `scripts/` | OGS runs (`run_samples`, `run_nominal`); `surrogates/` fits (`pce`, `pce_wafp`, `ipm`, `lbfm`, `spline`, shared `settings.jl`); `sensitivity/` (`src`); `auxiliary/` dataset and figures |
 | `tools/` | `dataset.jl` (inputs + output DataFrame for GP training), `domain_analyzer.jl` |
 | `models/` | OGS inputs: `multilayer_irz` (template), `multilayer_irz_nominal` |
-| `data/` | generated, not in git: `runs/`, `surrogates/`, `datasets/` |
-| `archive/`, `docs/` | 1-layer model, original models, Kim's post-processing |
+| `data/` | generated: `runs/`, `surrogates/`, `sensitivity/`, `figures/` (not in git); `datasets/` (in git) |
+| `docs/` | notes: `surrogates.md` (overview and results), `ipm.md`, `lbfm.md`, `spline.md`, `sensitivity.md`; Kim's post-processing |
+| `archive/` | 1-layer model, original models |
 
 ## Setup
 
