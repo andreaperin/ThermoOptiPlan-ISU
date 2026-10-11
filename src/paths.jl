@@ -9,3 +9,4 @@ const RUNS_DIR = joinpath(DATA_DIR, "runs")             # raw OGS output
 const SURROGATES_DIR = joinpath(DATA_DIR, "surrogates") # fitted PCE/GP objects
 const DATASETS_DIR = joinpath(DATA_DIR, "datasets")     # clean input/output tables
 const FIGURES_DIR = joinpath(DATA_DIR, "figures")       # generated plots
+const SENSITIVITY_DIR = joinpath(DATA_DIR, "sensitivity") # sensitivity indices
