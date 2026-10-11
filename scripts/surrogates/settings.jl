@@ -4,6 +4,7 @@
 using JLD2, DataFrames, Random
 
 include(joinpath(@__DIR__, "..", "..", "src", "paths.jl"))
+include(joinpath(@__DIR__, "..", "..", "src", "inputs.jl")) # inputs_v1(), inputs_v2()
 
 DATASET = "v2_123" # uses data/datasets/dataset_3layers_<DATASET>.jld2
 TEST_PERCENT = 20  # % of the runs kept for testing (e.g. 20 or 90)
@@ -36,3 +37,11 @@ function scaler(train, inputs)
     end
     return scale, lo, hi
 end
+
+"""
+    input_distributions()
+
+The 15 input random variables the dataset `DATASET` was sampled from: `inputs_v1()` for the
+v1 datasets, `inputs_v2()` for the v2 ones.
+"""
+input_distributions() = startswith(DATASET, "v1") ? inputs_v1() : inputs_v2()

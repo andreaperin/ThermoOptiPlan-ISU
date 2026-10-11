@@ -2,6 +2,7 @@ using UncertaintyQuantification
 
 include(joinpath(@__DIR__, "paths.jl"))
 include(joinpath(@__DIR__, "extractor.jl"))
+include(joinpath(@__DIR__, "inputs.jl"))
 
 # Layer naming: the solid-property RVs are numbered 1/2/3, the OGS parameters 2/3/4.
 #   sandstone1 / Sandstone_2 -> top    (Sand_2, medium 1)
@@ -46,44 +47,8 @@ const extrafiles = [
     "Multi_BW_line_IRZ.pvd"
 ]
 
-# Random variables
-
-# Normal with σ = 10% of the nominal value, truncated at ±20% around it
-layer_distribution(nominal::Real) = Truncated(Normal(nominal, 0.1 * nominal), 0.8 * nominal, 1.2 * nominal)
-
-dist_thermal_conductivity_sandstone = Truncated(Normal(2.38, 0.25), 0.75 * 2.38, 1.25 * 2.38) # Approx 25% uncertainty window tapered towards the limits
-dist_specific_heat_capacity_sandstone = Truncated(Normal(820, 80), 615, 1025) # Approx 25% uncertainty window tapered towards the limits
-dist_density_sandstone = Truncated(Normal(2690, 100), 2400, 2800) # Approx 10% uncertainty window tapered towards the limits
-
-dist_porosity_parameter_sandstone1 = layer_distribution(0.19)
-dist_porosity_parameter_sandstone2 = layer_distribution(0.20)
-dist_porosity_parameter_sandstone3 = layer_distribution(0.22)
-
-dist_kappa_sandstone1 = layer_distribution(1.56e-13)
-dist_kappa_sandstone2 = layer_distribution(2.39e-13)
-dist_kappa_sandstone3 = layer_distribution(4.97e-13)
-
-thermal_conductivity_sandstone1 = RandomVariable(dist_thermal_conductivity_sandstone, :thermal_conductivity_sandstone1)
-thermal_conductivity_sandstone2 = RandomVariable(dist_thermal_conductivity_sandstone, :thermal_conductivity_sandstone2)
-thermal_conductivity_sandstone3 = RandomVariable(dist_thermal_conductivity_sandstone, :thermal_conductivity_sandstone3)
-
-specific_heat_capacity_sandstone1 = RandomVariable(dist_specific_heat_capacity_sandstone, :specific_heat_capacity_sandstone1)
-specific_heat_capacity_sandstone2 = RandomVariable(dist_specific_heat_capacity_sandstone, :specific_heat_capacity_sandstone2)
-specific_heat_capacity_sandstone3 = RandomVariable(dist_specific_heat_capacity_sandstone, :specific_heat_capacity_sandstone3)
-
-density_sandstone1 = RandomVariable(dist_density_sandstone, :density_sandstone1)
-density_sandstone2 = RandomVariable(dist_density_sandstone, :density_sandstone2)
-density_sandstone3 = RandomVariable(dist_density_sandstone, :density_sandstone3)
-
-porosity_parameter1 = RandomVariable(dist_porosity_parameter_sandstone1, :sandstone_porosity_parameter_2)
-porosity_parameter2 = RandomVariable(dist_porosity_parameter_sandstone2, :sandstone_porosity_parameter_3)
-porosity_parameter3 = RandomVariable(dist_porosity_parameter_sandstone3, :sandstone_porosity_parameter_4)
-
-kappa_sandstone1 = RandomVariable(dist_kappa_sandstone1, :kappa_Sandstone_2)
-kappa_sandstone2 = RandomVariable(dist_kappa_sandstone2, :kappa_Sandstone_3)
-kappa_sandstone3 = RandomVariable(dist_kappa_sandstone3, :kappa_Sandstone_4)
-
-inputs = [thermal_conductivity_sandstone1, thermal_conductivity_sandstone2, thermal_conductivity_sandstone3, specific_heat_capacity_sandstone1, specific_heat_capacity_sandstone2, specific_heat_capacity_sandstone3, density_sandstone1, density_sandstone2, density_sandstone3, porosity_parameter1, porosity_parameter2, porosity_parameter3, kappa_sandstone1, kappa_sandstone2, kappa_sandstone3]
+# Random variables: the distributions are in inputs.jl (v1 = old datasets, v2 = current)
+inputs = inputs_v2()
 
 # OGS model
 

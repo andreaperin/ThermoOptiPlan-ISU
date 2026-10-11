@@ -9,7 +9,7 @@ const PCE_DEGREE = 4
 const WORK_DIR = joinpath(RUNS_DIR, "multilayer_irz")
 const cleanup = false
 
-wafp_inputs = [kappa_sandstone2, kappa_sandstone3]
+wafp_inputs = filter(rv -> rv.name in (:kappa_Sandstone_3, :kappa_Sandstone_4), inputs) # middle and bottom κ
 
 ext = ogs_model(WORK_DIR; cleanup=cleanup)
 

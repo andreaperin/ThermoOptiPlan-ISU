@@ -17,7 +17,7 @@ Solid properties are numbered `sandstone1/2/3`, OGS parameters `_2/_3/_4`; both 
 
 ## Random inputs
 
-All are truncated normal: TN(μ, σ) on [lower, upper]. The name is both the placeholder in the `.prj` and the column name in the datasets. Defined in `src/model_3layers.jl`.
+All are truncated normal: TN(μ, σ) on [lower, upper]. The name is both the placeholder in the `.prj` and the column name in the datasets. Defined in `src/inputs.jl` as `inputs_v2()` (used by `src/model_3layers.jl` and the v2 datasets).
 
 | Name | Property | Layer | μ | σ | Bounds |
 |---|---|---|---|---|---|
@@ -41,7 +41,7 @@ Porosity and permeability: σ = 10% of μ, bounds ±20%. Thermal conductivity an
 
 ## Previous distributions (v1)
 
-The runs in `data/surrogates/` (128/256/512) were sampled before 2026-10 with:
+The runs sampled before 2026-10 (the PCE runs 128/256/512 and the NAS 1024 run, i.e. the datasets `v1_pce` and `v1_969`) used these distributions, defined in `src/inputs.jl` as `inputs_v1()`:
 
 | Inputs | v1 distribution |
 |---|---|
@@ -49,3 +49,5 @@ The runs in `data/surrogates/` (128/256/512) were sampled before 2026-10 with:
 | porosity top / middle / bottom | TN(0.19 / 0.20 / 0.22, 0.05) on [0.18, 0.23] |
 | permeability top / middle / bottom | TN(1.56 / 2.39 / 4.97 e-13, 2.868e-13) on [1.912e-13, 2.868e-13] |
 | heat capacity, density | as above |
+
+Porosity and permeability use one window for all layers with σ much larger than the window, so they are almost uniform; the top and bottom permeability nominal values lie outside that window, so all three layers were sampled on the middle-layer range.
