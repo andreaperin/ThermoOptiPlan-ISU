@@ -77,7 +77,7 @@ function plot_ipm(file::String, key::String; name::String = key)
     ϵmax = something(findfirst(ϵ -> reliability(ipm, ϵ) < 1.0e-3, 0.01:0.01:1), 100) / 100
     step = ϵmax <= 0.25 ? 0.05 : 0.1
     ϵmax = ceil(max(ϵmax, 1 - mean(inside)) / step) * step
-    ϵs = range(0.01, ϵmax; length = 100)
+    ϵs = range(0.01, ϵmax; length = 30)
     ticks = collect(0:step:(ϵmax + 1.0e-9))
     p_rel = @pgf Axis(
         {
@@ -91,7 +91,7 @@ function plot_ipm(file::String, key::String; name::String = key)
             legend_pos = "south east",
             ymin = 0, ymax = 1.05,
         },
-        Plot({thick, color = "blue"}, Coordinates(ϵs, 1 .- reliability.(Ref(ipm), ϵs))),
+        Plot({only_marks, mark = "*", mark_size = "1pt", color = "blue"}, Coordinates(ϵs, 1 .- reliability.(Ref(ipm), ϵs))),
         LegendEntry(L"P(\mathrm{coverage} \geq 1-\epsilon)"),
         Plot({dashed, color = "red"}, Coordinates([1 - mean(inside), 1 - mean(inside)], [0, 1.05])),
         LegendEntry("test miss rate"),
